@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.EchoSOS" parent="Theme.Material3.DayNight.NoActionBar"></style>
+
+    <style name="Theme.EchoSOS.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.EchoSOS</item>
+    </style>
+
+</resources>

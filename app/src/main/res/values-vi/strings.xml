@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">EchoSOS</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_map">Bản đồ</string>
+    <string name="nav_contacts">Liên hệ khẩn</string>
+    <string name="name">Họ tên</string>
+    <string name="phone">Số điện thoại</string>
+    <string name="email">Email</string>
+    <string name="address">Địa chỉ</string>
+    <string name="pin_code">Mã PIN</string>
+    <string name="save">Lưu</string>
+    <string name="saved">Đã lưu</string>
+    <string name="cancel">Hủy</string>
+    <string name="edit">Sửa</string>
+    <string name="edit_profile">Sửa hồ sơ</string>
+    <string name="add">Thêm</string>
+    <string name="add_contact">Thêm liên hệ</string>
+    <string name="relation">Mối quan hệ</string>
+    <string name="pick_from_phone">Chọn từ danh bạ</string>
+    <string name="add_manually">Nhập thủ công</string>
+
+</resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "767780755551",
+    "project_id": "echosos-f89d6",
+    "storage_bucket": "echosos-f89d6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767780755551:android:04077cade3f76cf64163ea",
+        "android_client_info": {
+          "package_name": "com.example.echosos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdvu5DDUfR60K9z51HisASwnL9YpCdskA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
