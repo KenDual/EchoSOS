@@ -32,8 +32,18 @@ public class HomeFragment extends Fragment {
         btn.setOnClickListener(view -> startSosCountdown());
     }
 
+    @Override
+    public void onRequestPermissionsResult(int req, @NonNull String[] perms, @NonNull int[] res) {
+        super.onRequestPermissionsResult(req, perms, res);
+        if (req == 1001 && com.example.echosos.utils.Permissions.hasAll(requireContext(),
+                com.example.echosos.utils.Permissions.merge(
+                        com.example.echosos.utils.Permissions.LOCATION,
+                        com.example.echosos.utils.Permissions.sms()))) {
+            startSosCountdown(); // retry sau khi user cấp quyền
+        }
+    }
+
     private void startSosCountdown() {
-        // xin quyền cần thiết (LOCATION + SMS) tối thiểu cho Phase 3
         if (!Permissions.hasAll(requireContext(), Permissions.LOCATION)
                 || !Permissions.hasAll(requireContext(), Permissions.sms())) {
             requestPermissions(Permissions.merge(Permissions.LOCATION, Permissions.sms()), 1001);
@@ -55,17 +65,70 @@ public class HomeFragment extends Fragment {
 
         new CountDownTimer(5000, 1000) {
             int sec = 5;
-            @Override public void onTick(long ms) {
+
+            @Override
+            public void onTick(long ms) {
                 sec--;
                 tv.setText(getString(R.string.sos_countdown, sec));
                 if (vib != null) vib.vibrate(50);
                 if (!dlg.isShowing()) cancel();
             }
-            @Override public void onFinish() {
+
+            @Override
+            public void onFinish() {
                 if (!dlg.isShowing()) return;
-                tv.setText(getString(R.string.sos_sending));
                 dlg.dismiss();
-                // TODO: gửi SMS đến danh sách liên hệ + ghi lịch sử (Phase 3 tiếp)
+
+                // 1) Lấy vị trí 1 lần
+                com.example.echosos.utils.LocationFetcher.getCurrentFix(requireContext(), fix -> {
+                    // 2) Build nội dung SOS
+                    String msg = com.example.echosos.utils.SosMessageBuilder.build(requireContext(), fix);
+
+                    // 3) Lấy danh sách số liên hệ
+                    com.example.echosos.data.dao.EmergencyContactDao cDao =
+                            new com.example.echosos.data.dao.EmergencyContactDao(requireContext());
+                    long userId = com.example.echosos.utils.Prefs.getUserId(requireContext());
+                    java.util.List<String> phones = new java.util.ArrayList<>();
+                    for (com.example.echosos.data.model.EmergencyContact c : cDao.getByUser(userId)) {
+                        phones.add(c.getPhone());
+                    }
+
+                    // 4) Gửi SMS hàng loạt
+                    com.example.echosos.utils.SmsSender.sendBulk(requireContext(), phones, msg,
+                            new com.example.echosos.utils.SmsSender.Callback() {
+                                boolean allOk = true;
+
+                                @Override
+                                public void onEachResult(String phone, boolean ok) {
+                                    allOk &= ok;
+                                }
+
+                                @Override
+                                public void onAllDone() {
+                                    // 5) Ghi lịch sử SOS
+                                    com.example.echosos.data.model.SosEvent e =
+                                            new com.example.echosos.data.model.SosEvent();
+                                    e.setUserId(userId);
+                                    if (fix != null) {
+                                        e.setLat(fix.lat);
+                                        e.setLng(fix.lng);
+                                        e.setAccuracy(fix.acc);
+                                        e.setAddress(fix.address);
+                                    }
+                                    e.setMessage(msg);
+                                    e.setSmsSent(allOk);
+                                    e.setCreatedAt(System.currentTimeMillis());
+
+                                    new com.example.echosos.data.dao.SosHistoryDao(requireContext()).insert(e);
+
+                                    android.widget.Toast.makeText(
+                                            requireContext(),
+                                            allOk ? R.string.saved : R.string.sos_partial_fail,
+                                            android.widget.Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            });
+                });
             }
         }.start();
     }

@@ -18,4 +18,15 @@ public final class Prefs {
     public static long getUserId(Context c) {
         return c.getSharedPreferences(NAME, Context.MODE_PRIVATE).getLong(KEY_UID, -1);
     }
+
+    public static String getPin(Context ctx) {
+        return ctx.getSharedPreferences("echosos_prefs", Context.MODE_PRIVATE)
+                .getString("pin", "");
+    }
+
+    public static void setPin(Context ctx, String pin) {
+        ctx.getSharedPreferences("echosos_prefs", Context.MODE_PRIVATE)
+                .edit().putString("pin", pin == null ? "" : pin).apply();
+    }
+
 }

@@ -1,0 +1,8 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/etPin"
+        android:inputType="numberPassword"
+        android:hint="@string/pin_code"
+        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</FrameLayout>

@@ -25,4 +25,6 @@
     <string name="sos">SOS</string>
     <string name="sos_countdown">Gửi sau %1$ds…</string>
     <string name="sos_sending">Đang gửi SOS…</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="sos_partial_fail">Đã gửi, nhưng có một số số điện thoại bị lỗi</string>=
 </resources>

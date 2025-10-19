@@ -25,4 +25,6 @@
     <string name="sos">SOS</string>
     <string name="sos_countdown">Sending in %1$ds…</string>
     <string name="sos_sending">Sending SOS…</string>
+    <string name="confirm">Confirm</string>
+    <string name="sos_partial_fail">Sent, but some numbers failed</string>
 </resources>
