@@ -18,5 +18,11 @@
     <string name="relation">Mối quan hệ</string>
     <string name="pick_from_phone">Chọn từ danh bạ</string>
     <string name="add_manually">Nhập thủ công</string>
-
+    <string name="primary">Chính</string>
+    <string name="secondary">Phụ</string>
+    <string name="delete">Xóa</string>
+    <string name="edit_contact">Sửa liên hệ</string>
+    <string name="sos">SOS</string>
+    <string name="sos_countdown">Gửi sau %1$ds…</string>
+    <string name="sos_sending">Đang gửi SOS…</string>
 </resources>

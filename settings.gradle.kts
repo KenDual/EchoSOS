@@ -1,8 +1,9 @@
 pluginManagement {
     repositories {
-        mavenCentral()
         google()
+        mavenCentral()
         gradlePluginPortal()
+        maven(url = "https://maven.google.com") // mirror
     }
 }
 dependencyResolutionManagement {
@@ -10,8 +11,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://maven.google.com") // mirror
     }
 }
+
 
 rootProject.name = "EchoSOS"
 include(":app")

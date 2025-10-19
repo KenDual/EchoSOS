@@ -47,13 +47,12 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("androidx.core:core-splashscreen:1.0.1")
 
-    // Firebase
+    // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
 
-    // Google Play services BOM
-    implementation(platform("com.google.android.gms:play-services-bom:33.4.0"))
-    implementation("com.google.android.gms:play-services-maps")
-    implementation("com.google.android.gms:play-services-location")
+    // Play Services BoM
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 }

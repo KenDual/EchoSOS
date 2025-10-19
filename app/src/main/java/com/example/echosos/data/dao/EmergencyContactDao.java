@@ -80,4 +80,17 @@ public class EmergencyContactDao {
         e.setCreatedAt(c.getLong(c.getColumnIndexOrThrow(EmergencyContacts.COL_CREATED)));
         return e;
     }
+
+    public void setPrimary(long userId, long contactId){
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues cv0 = new ContentValues(); cv0.put(EmergencyContacts.COL_PRIORITY, 0);
+            db.update(EmergencyContacts.TBL, cv0, EmergencyContacts.COL_USER_ID+"=?", new String[]{String.valueOf(userId)});
+            ContentValues cv1 = new ContentValues(); cv1.put(EmergencyContacts.COL_PRIORITY, 1);
+            db.update(EmergencyContacts.TBL, cv1, EmergencyContacts.COL_ID+"=?", new String[]{String.valueOf(contactId)});
+            db.setTransactionSuccessful();
+        } finally { db.endTransaction(); }
+    }
+
 }

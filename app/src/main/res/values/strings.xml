@@ -18,5 +18,11 @@
     <string name="relation">Relation</string>
     <string name="pick_from_phone">Pick from phone</string>
     <string name="add_manually">Add manually</string>
-
+    <string name="primary">Primary</string>
+    <string name="secondary">Secondary</string>
+    <string name="delete">Delete</string>
+    <string name="edit_contact">Edit contact</string>
+    <string name="sos">SOS</string>
+    <string name="sos_countdown">Sending in %1$ds…</string>
+    <string name="sos_sending">Sending SOS…</string>
 </resources>

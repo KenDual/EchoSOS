@@ -8,14 +8,18 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Patterns;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.*;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,93 +43,112 @@ public class ContactsFragment extends Fragment {
     private final List<EmergencyContact> data = new ArrayList<>();
     private Adapter adapter;
 
+    // Request READ_CONTACTS then open picker
     private final ActivityResultLauncher<String[]> permReq =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), res -> pickFromPhone());
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                    res -> pickFromPhone());
+
+    // Contact picker
     private final ActivityResultLauncher<Intent> pickContact =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> {
                 if (r.getData() == null) return;
                 Uri uri = r.getData().getData();
                 if (uri == null) return;
-                String name = null, phone = null;
 
-                try (Cursor contactCursor = requireContext().getContentResolver().query(uri, null, null, null, null)) {
-                    if (contactCursor != null && contactCursor.moveToFirst()) {
-                        // Lấy chỉ số cột một cách an toàn
-                        int nameIndex = contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
-                        int idIndex = contactCursor.getColumnIndex(ContactsContract.Contacts._ID);
+                String name = null, phone = null, contactId = null;
 
-                        if (nameIndex != -1) {
-                            name = contactCursor.getString(nameIndex);
-                        }
-
-                        if (idIndex != -1) {
-                            String contactId = contactCursor.getString(idIndex);
-
-                            // Bước 2: Dùng ID để truy vấn số điện thoại
-                            try (Cursor phoneCursor = requireContext().getContentResolver().query(
-                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                    null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                                    new String[]{contactId},
-                                    null)) {
-
-                                if (phoneCursor != null && phoneCursor.moveToFirst()) {
-                                    int phoneIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                                    if (phoneIndex != -1) {
-                                        phone = phoneCursor.getString(phoneIndex);
-                                    }
-                                }
-                            }
-                        }
+                // Query minimal projection to avoid -1 indexes
+                String[] contactProj = {
+                        ContactsContract.Contacts._ID,
+                        ContactsContract.Contacts.DISPLAY_NAME
+                };
+                try (Cursor c = requireContext().getContentResolver()
+                        .query(uri, contactProj, null, null, null)) {
+                    if (c != null && c.moveToFirst()) {
+                        int idIdx = c.getColumnIndexOrThrow(ContactsContract.Contacts._ID);
+                        int nameIdx = c.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME);
+                        contactId = c.getString(idIdx);
+                        name = c.getString(nameIdx);
                     }
                 } catch (Exception e) {
-                    // Ghi lại log lỗi để debug nếu cần
-                    // Log.e("ContactsFragment", "Error picking contact", e);
-                    toast("Could not read contact data.");
+                    toast("Could not read contact.");
                 }
-                showAddDialog(name, phone);
+
+                if (!TextUtils.isEmpty(contactId)) {
+                    String[] phoneProj = { ContactsContract.CommonDataKinds.Phone.NUMBER };
+                    try (Cursor p = requireContext().getContentResolver().query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            phoneProj,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
+                            new String[]{ contactId }, null)) {
+                        if (p != null && p.moveToFirst()) {
+                            int phoneIdx = p.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                            phone = p.getString(phoneIdx);
+                        }
+                    } catch (Exception e) {
+                        toast("No phone found.");
+                    }
+                }
+
+                showAddOrEditDialog(null, name, phone);
             });
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c, @Nullable Bundle b) {
         View v = inf.inflate(R.layout.fragment_contacts, c, false);
+
         RecyclerView rv = v.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new Adapter(data);
+        adapter = new Adapter();
         rv.setAdapter(adapter);
+
+        // Swipe to delete
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override public boolean onMove(@NonNull RecyclerView r, @NonNull RecyclerView.ViewHolder vh, @NonNull RecyclerView.ViewHolder t) { return false; }
+            @Override public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int dir) {
+                int pos = vh.getBindingAdapterPosition();
+                if (pos >= 0 && pos < data.size()) {
+                    EmergencyContact e = data.get(pos);
+                    dao.delete(e.getId());
+                    reload();
+                    toast(getString(R.string.delete));
+                }
+            }
+        }).attachToRecyclerView(rv);
 
         FloatingActionButton fab = v.findViewById(R.id.fabAdd);
         fab.setOnClickListener(x -> chooseAddMethod());
+
         dao = new EmergencyContactDao(requireContext());
         userId = Prefs.getUserId(requireContext());
+
         reload();
         return v;
     }
 
     private void reload() {
         data.clear();
-        if (userId > 0) data.addAll(dao.getByUser(userId));
-        adapter.notifyDataSetChanged();
+        if (userId > 0) data.addAll(dao.getByUser(userId)); // sorted: primary first
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 
     private void chooseAddMethod() {
-        String[] items = {getString(R.string.pick_from_phone), getString(R.string.add_manually)};
+        String[] items = { getString(R.string.pick_from_phone), getString(R.string.add_manually) };
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.add_contact)
                 .setItems(items, (d, i) -> {
                     if (i == 0) {
-                        // picker
                         if (!hasContactsPerm()) permReq.launch(Permissions.contacts());
                         else pickFromPhone();
                     } else {
-                        showAddDialog(null, null);
+                        showAddOrEditDialog(null, null, null);
                     }
                 }).show();
     }
 
     private boolean hasContactsPerm() {
-        return Permissions.hasAll(requireContext(), new String[]{Manifest.permission.READ_CONTACTS});
+        return Permissions.hasAll(requireContext(), new String[]{ Manifest.permission.READ_CONTACTS });
     }
 
     private void pickFromPhone() {
@@ -133,39 +156,64 @@ public class ContactsFragment extends Fragment {
         pickContact.launch(i);
     }
 
-    private void showAddDialog(String namePre, String phonePre) {
+    /** Add (e == null) or Edit (e != null) */
+    private void showAddOrEditDialog(@Nullable EmergencyContact e,
+                                     @Nullable String namePre,
+                                     @Nullable String phonePre) {
         View form = getLayoutInflater().inflate(R.layout.dialog_add_contact, null, false);
         TextInputEditText etName = form.findViewById(R.id.etName);
         TextInputEditText etPhone = form.findViewById(R.id.etPhone);
         TextInputEditText etRelation = form.findViewById(R.id.etRelation);
         Slider slider = form.findViewById(R.id.sliderPriority);
-        if (!TextUtils.isEmpty(namePre)) etName.setText(namePre);
-        if (!TextUtils.isEmpty(phonePre)) etPhone.setText(phonePre);
+
+        if (e != null) {
+            etName.setText(e.getName());
+            etPhone.setText(e.getPhone());
+            etRelation.setText(e.getRelation());
+            slider.setValue(e.getPriority());
+        } else {
+            if (!TextUtils.isEmpty(namePre)) etName.setText(namePre);
+            if (!TextUtils.isEmpty(phonePre)) etPhone.setText(phonePre);
+        }
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.add_contact)
+                .setTitle(e == null ? R.string.add_contact : R.string.edit_contact)
                 .setView(form)
                 .setPositiveButton(R.string.save, (d, w) -> {
-                    String name = s(etName), phone = s(etPhone), relation = s(etRelation);
-                    if (TextUtils.isEmpty(name)) {
-                        toast("Name required");
-                        return;
+                    String name = text(etName);
+                    String phone = normalizePhone(text(etPhone));
+                    String relation = text(etRelation);
+
+                    if (TextUtils.isEmpty(name)) { toast("Name required"); return; }
+                    if (TextUtils.isEmpty(phone) || !Patterns.PHONE.matcher(phone).matches()) { toast("Invalid phone"); return; }
+
+                    int prio = (int) slider.getValue();
+                    if (e == null) {
+                        EmergencyContact ec = new EmergencyContact(userId, name, phone, prio);
+                        ec.setRelation(relation);
+                        long newId = dao.insert(ec);
+                        if (prio == 1) dao.setPrimary(userId, newId);
+                    } else {
+                        e.setName(name);
+                        e.setPhone(phone);
+                        e.setRelation(relation);
+                        e.setPriority(prio);
+                        dao.update(e);
+                        if (prio == 1) dao.setPrimary(userId, e.getId());
                     }
-                    if (TextUtils.isEmpty(phone) || !Patterns.PHONE.matcher(phone).matches()) {
-                        toast("Invalid phone");
-                        return;
-                    }
-                    EmergencyContact ec = new EmergencyContact(userId, name, phone, (int) slider.getValue());
-                    ec.setRelation(relation);
-                    dao.insert(ec);
                     reload();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
-    private static String s(TextInputEditText e) {
+    private static String text(TextInputEditText e) {
         return e.getText() == null ? "" : e.getText().toString().trim();
+    }
+
+    private static String normalizePhone(String raw) {
+        if (raw == null) return "";
+        return raw.replaceAll("[^0-9+]", ""); // keep digits and +
     }
 
     private void toast(String m) {
@@ -173,12 +221,7 @@ public class ContactsFragment extends Fragment {
     }
 
     // ----------------- RecyclerView Adapter -----------------
-    static class Adapter extends RecyclerView.Adapter<VH> {
-        private final List<EmergencyContact> data;
-
-        Adapter(List<EmergencyContact> d) {
-            data = d;
-        }
+    private class Adapter extends RecyclerView.Adapter<VH> {
 
         @NonNull
         @Override
@@ -192,20 +235,32 @@ public class ContactsFragment extends Fragment {
             EmergencyContact e = data.get(i);
             h.tvName.setText(e.getName());
             h.tvPhone.setText(e.getPhone());
-            String meta = (e.getPriority() == 1 ? "Primary" : "Secondary") +
-                    (TextUtils.isEmpty(e.getRelation()) ? "" : " • " + e.getRelation());
+
+            String meta = (e.getPriority() == 1
+                    ? h.itemView.getContext().getString(R.string.primary)
+                    : h.itemView.getContext().getString(R.string.secondary));
+
+            if (!TextUtils.isEmpty(e.getRelation())) meta += " • " + e.getRelation();
             h.tvMeta.setText(meta);
+
+            // Click to Edit
+            h.itemView.setOnClickListener(v -> showAddOrEditDialog(e, null, null));
+
+            // Long-press to set Primary
+            h.itemView.setOnLongClickListener(v -> {
+                dao.setPrimary(userId, e.getId());
+                reload();
+                toast(getString(R.string.primary));
+                return true;
+            });
         }
 
         @Override
-        public int getItemCount() {
-            return data.size();
-        }
+        public int getItemCount() { return data.size(); }
     }
 
-    static class VH extends RecyclerView.ViewHolder {
-        TextView tvName, tvPhone, tvMeta;
-
+    private static class VH extends RecyclerView.ViewHolder {
+        final TextView tvName, tvPhone, tvMeta;
         VH(@NonNull View v) {
             super(v);
             tvName = v.findViewById(R.id.tvName);
