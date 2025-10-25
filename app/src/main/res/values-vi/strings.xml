@@ -26,5 +26,15 @@
     <string name="sos_countdown">Gửi sau %1$ds…</string>
     <string name="sos_sending">Đang gửi SOS…</string>
     <string name="confirm">Xác nhận</string>
-    <string name="sos_partial_fail">Đã gửi, nhưng có một số số điện thoại bị lỗi</string>=
+    <string name="sos_partial_fail">Đã gửi, nhưng có một số số điện thoại bị lỗi</string>
+    <string name="you">Bạn</string>
+    <string name="emergency_call">Cuộc gọi khẩn cấp</string>
+    <string name="call">Gọi</string>
+    <string name="start_live">Bắt đầu phát trực tiếp</string>
+    <string name="stop_live">Ngưng phát trực tiếp</string>
+    <string name="accuracy">Chính xác</string>
+    <string name="recording_on">Đang thu</string>
+    <string name="recording_off">Ngắt thu</string>
+    <string name="upload_failed_retry">Gửi thất bại. Sẽ thử la.</string>
+    <string name="no_internet">Không có kết nối mạng</string>
 </resources>

@@ -48,6 +48,16 @@ public class UserDao {
                 new String[]{String.valueOf(u.getId())});
     }
 
+    public boolean exists(long id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        try (Cursor c = db.rawQuery(
+                "SELECT 1 FROM " + Users.TBL + " WHERE " + Users.COL_ID + "=? LIMIT 1",
+                new String[]{ String.valueOf(id) })) {
+            return c.moveToFirst();
+        }
+    }
+
+
     public int deleteById(long id) {
         return helper.getWritableDatabase().delete(Users.TBL, Users.COL_ID + "=?",
                 new String[]{String.valueOf(id)});

@@ -19,15 +19,21 @@ public class MainActivity extends AppCompatActivity {
         nav.setOnItemSelectedListener(item -> {
             Fragment f;
             int id = item.getItemId();
-            if (id == R.id.nav_map) f = new MapFragment();
-            else if (id == R.id.nav_contacts) f = new ContactsFragment();
-            else f = new HomeFragment();
+            if (id == R.id.nav_map) {
+                f = new MapFragment();
+            } else if (id == R.id.nav_contacts) {
+                f = new ContactsFragment();
+            } else if (id == R.id.nav_call) {
+                f = new CallFragment();
+            } else {
+                f = new HomeFragment();
+            }
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, f).commit();
+                    .replace(R.id.container, f)
+                    .commit();
             return true;
         });
 
-        // mặc định
         if (savedInstanceState == null) {
             nav.setSelectedItemId(R.id.nav_home);
         }

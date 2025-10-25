@@ -4,7 +4,7 @@ public class DatabaseContract {
     private DatabaseContract(){}
 
     public static final String DB_NAME = "echosos.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     public static final class Users {
         public static final String TBL = "users";
@@ -43,4 +43,26 @@ public class DatabaseContract {
         public static final String COL_CALL_MADE = "call_made";
         public static final String COL_AUDIO_URL = "audio_url";
     }
+
+    public static final class CallHistory {
+        public static final String TBL = "call_history";
+        public static final String COL_ID = "id";
+        public static final String COL_USER_ID = "user_id";
+        public static final String COL_PHONE = "phone";
+        public static final String COL_LABEL = "label";
+        public static final String COL_CREATED = "created_at";
+        public static final String COL_DURATION = "duration_sec";
+    }
+
+    public static final class RecordingChunks {
+        public static final String TBL = "recording_chunks";
+        public static final String COL_ID = "id";
+        public static final String COL_USER_ID = "user_id";
+        public static final String COL_EVENT_ID = "event_id";
+        public static final String COL_PATH = "local_path";
+        public static final String COL_URL = "remote_url";
+        public static final String COL_STATUS = "status";
+        public static final String COL_CREATED = "created_at";
+    }
+
 }
