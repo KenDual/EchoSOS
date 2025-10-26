@@ -1,34 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="16dp"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/surface">
 
+    <!-- Dialog Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thêm liên hệ khẩn cấp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/onSurface"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Name Input - FIXED VERSION -->
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:hintEnabled="true">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="@string/name"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            android:inputType="textPersonName"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_person"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/onSurfaceVariant"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Phone Input - FIXED VERSION -->
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:hintEnabled="true">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPhone"
-            android:hint="@string/phone" android:inputType="phone"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/phone"
+            android:inputType="phone"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_phone"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/onSurfaceVariant"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Relation Input - FIXED VERSION -->
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:hintEnabled="true">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etRelation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="@string/relation"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            android:inputType="text"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_family"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/onSurfaceVariant"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.slider.Slider
-        android:id="@+id/sliderPriority"
-        android:valueFrom="0" android:valueTo="1" android:stepSize="1"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <!-- Priority Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Độ ưu tiên"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/onSurface"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thấp"
+            android:textSize="12sp"
+            android:textColor="@color/onSurfaceVariant" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderPriority"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:valueFrom="0"
+            android:valueTo="1"
+            android:stepSize="1"
+            android:layout_marginHorizontal="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cao"
+            android:textSize="12sp"
+            android:textColor="@color/onSurfaceVariant" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Liên hệ ưu tiên cao sẽ được gọi trước"
+        android:textSize="11sp"
+        android:textColor="@color/onSurfaceVariant"
+        android:layout_marginBottom="16dp" />
+
 </LinearLayout>

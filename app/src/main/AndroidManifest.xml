@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Features -->
+    xmlns:tools="http://schemas.android.com/tools"> <!-- Features -->
     <uses-feature
         android:name="android.hardware.telephony"
-        android:required="false" />
-
-    <!-- Permissions -->
+        android:required="false" /> <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:targetApi="33" />
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        tools:targetApi="33" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-
-    <!-- Foreground service capabilities -->
+    <uses-permission android:name="android.permission.VIBRATE" /> <!-- Foreground service capabilities -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" tools:targetApi="34" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"
+        tools:targetApi="34" />
 
     <application
         android:allowBackup="true"
@@ -32,9 +30,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.EchoSOS">
-
-        <!-- Splash (launcher) -->
+        android:theme="@style/Theme.EchoSOS"> <!-- Splash (launcher) -->
         <activity
             android:name=".ui.main.SplashActivity"
             android:exported="true"
@@ -43,47 +39,33 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Main Activity -->
+        </activity> <!-- Main Activity -->
         <activity android:name=".ui.main.MainActivity" />
         <activity android:name=".ui.main.MapsActivity" />
         <activity android:name=".ui.main.SettingsActivity" />
-        <activity android:name=".ui.main.AboutActivity" />
-
-        <!-- Google Maps API Key -->
+        <activity android:name=".ui.main.AboutActivity" /> <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${GOOGLE_MAPS_API_KEY}" />
-
-        <!-- Location foreground service -->
+            android:value="${GOOGLE_MAPS_API_KEY}" /> <!-- Location foreground service -->
         <service
             android:name=".services.location.LocationService"
             android:exported="false"
             android:foregroundServiceType="location"
-            tools:ignore="ForegroundServicePermission" />
-
-        <!-- Recorder foreground service (ghi âm theo chunks) -->
+            tools:ignore="ForegroundServicePermission" /> <!-- Recorder foreground service (ghi âm theo chunks) -->
         <service
             android:name=".services.recording.RecorderService"
             android:exported="false"
             android:foregroundServiceType="microphone"
-            tools:ignore="ForegroundServicePermission" />
-
-        <!-- Retry upload service -->
+            tools:ignore="ForegroundServicePermission" /> <!-- Retry upload service -->
         <service
             android:name=".services.recording.UploadRetryService"
-            android:exported="false" />
-
-        <!-- Network state receiver -->
+            android:exported="false" /> <!-- Network state receiver -->
         <receiver
             android:name=".receivers.NetworkStateReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-
     </application>
-
 </manifest>

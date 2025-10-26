@@ -25,6 +25,8 @@ import com.google.android.gms.maps.model.*;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
+    private static final int REQ_LOC = 1010;
+
     private GoogleMap map;
     private TextView tvAccuracy;
     private Marker meMarker;
@@ -32,6 +34,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean firstFix = true;
     private FusedLocationProviderClient fused;
     private View btnToggleLive;
+    private View loading; // overlay từ view_loading.xml
 
     private final BroadcastReceiver locReceiver = new BroadcastReceiver() {
         @Override public void onReceive(Context ctx, Intent i) {
@@ -41,8 +44,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             float acc  = i.getFloatExtra(LocationService.EXTRA_ACC, 0f);
             LatLng p = new LatLng(lat, lng);
 
-            if (meMarker == null) meMarker = map.addMarker(new MarkerOptions().position(p).title(getString(R.string.you)));
-            else meMarker.setPosition(p);
+            if (meMarker == null) {
+                meMarker = map.addMarker(new MarkerOptions().position(p).title(getString(R.string.you)));
+            } else {
+                meMarker.setPosition(p);
+            }
 
             if (accCircle == null) {
                 accCircle = map.addCircle(new CircleOptions()
@@ -53,9 +59,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 accCircle.setRadius(Math.max(0, acc));
             }
 
-            if (tvAccuracy != null) { tvAccuracy.setText(String.format("±%.0f m", acc)); tvAccuracy.setVisibility(View.VISIBLE); }
+            if (tvAccuracy != null) {
+                tvAccuracy.setText(String.format("±%.0f m", acc));
+                tvAccuracy.setVisibility(View.VISIBLE);
+            }
 
-            if (firstFix) { map.animateCamera(CameraUpdateFactory.newLatLngZoom(p, 16f)); firstFix = false; }
+            if (firstFix) {
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(p, 16f));
+                firstFix = false;
+                setLoading(false); // tắt loading khi có fix đầu
+            }
         }
     };
 
@@ -68,24 +81,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
         super.onViewCreated(v, b);
         tvAccuracy = v.findViewById(R.id.tvAccuracy);
+        loading = v.findViewById(R.id.loadingOverlay);
+        setLoading(true);
+
         fused = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        // Nút START LIVE
+        // START/STOP live
         btnToggleLive = v.findViewById(R.id.btnToggleLive);
         if (btnToggleLive != null) {
-            // Disable khi Safe Mode bật
             applySafeModeState();
-
             btnToggleLive.setOnClickListener(x -> {
                 if (Prefs.isSafeMode(requireContext())) {
-                    // chặn khi đang Safe Mode
                     android.widget.Toast.makeText(requireContext(),
-                            getString(R.string.safe_mode_on),
-                            android.widget.Toast.LENGTH_SHORT).show();
+                            getString(R.string.safe_mode_on), android.widget.Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!Permissions.hasAll(requireContext(), Permissions.LOCATION)) {
-                    requestPermissions(Permissions.LOCATION, 1010);
+                    requestPermissions(Permissions.LOCATION, REQ_LOC);
                     return;
                 }
                 ContextCompat.startForegroundService(requireContext(), new Intent(requireContext(), LocationService.class));
@@ -125,6 +137,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
+    public void onDestroyView() {
+        map = null; meMarker = null; accCircle = null; tvAccuracy = null; btnToggleLive = null; loading = null;
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int req, @NonNull String[] perms, @NonNull int[] res) {
+        super.onRequestPermissionsResult(req, perms, res);
+        if (req == REQ_LOC && Permissions.hasAll(requireContext(), Permissions.LOCATION)) {
+            ContextCompat.startForegroundService(requireContext(), new Intent(requireContext(), LocationService.class));
+        }
+    }
+
+    @Override
     public void onMapReady(@NonNull GoogleMap gMap) {
         map = gMap;
         map.getUiSettings().setZoomControlsEnabled(true);
@@ -136,6 +162,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         } else {
             LatLng hcm = new LatLng(10.762622, 106.660172);
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 14f));
+            setLoading(false);
         }
     }
 
@@ -145,13 +172,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if (loc != null && firstFix && map != null) {
                 LatLng p = new LatLng(loc.getLatitude(), loc.getLongitude());
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(p, 16f));
+                firstFix = false;
+                setLoading(false);
             }
-        });
+        }).addOnFailureListener(e -> setLoading(false));
     }
 
-    @Override
-    public void onDestroyView() {
-        map = null; meMarker = null; accCircle = null; tvAccuracy = null; btnToggleLive = null;
-        super.onDestroyView();
+    private void setLoading(boolean show) {
+        if (loading != null) loading.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }

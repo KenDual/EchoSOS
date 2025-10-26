@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_lang_entries">
+        <item>Tiếng Việt</item><item>English</item>
+    </string-array>
+    <string-array name="pref_lang_values">
+        <item>vi</item><item>en</item>
+    </string-array>
+
+    <string-array name="pref_interval_entries">
+        <item>3s</item><item>5s</item><item>10s</item><item>30s</item><item>60s</item>
+    </string-array>
+    <string-array name="pref_interval_values">
+        <item>3000</item><item>5000</item><item>10000</item><item>30000</item><item>60000</item>
+    </string-array>
+</resources>

@@ -42,4 +42,27 @@
     <string name="safe_mode_off">Đã tắt Chế độ an toàn</string>
     <string name="safe_mode_block_sos">Chế độ an toàn đang bật. Không thể gửi SOS.</string>
     <string name="open_wifi_settings">Mở cài đặt Wi-Fi</string>
+    <string name="accuracy_placeholder">±— m</string>
+    <string name="call_police_112">Cảnh sát (112)</string>
+    <string name="call_ambulance_115">Cứu thương (115)</string>
+    <string name="call_family_sample">Gia đình (0768793319)</string>
+    <string name="invalid_phone">Số điện thoại không hợp lệ</string>
+    <string name="invalid_email">Email không hợp lệ</string>
+    <string name="required_name">Vui lòng nhập tên</string>
+    <string name="need_register_first">Hãy tạo hồ sơ trước khi dùng SOS.</string>
+
+    <string name="loading">Đang tải…</string>
+    <string name="empty_contacts">Chưa có liên hệ khẩn cấp</string>
+    <string name="empty_history">Chưa có lịch sử</string>
+
+    <string name="about_title">Giới thiệu</string>
+    <string name="settings_title">Cài đặt</string>
+    <string name="sos_template">Mẫu tin nhắn SOS</string>
+    <string name="auto_record">Tự động ghi âm</string>
+    <string name="location_interval">Chu kỳ cập nhật vị trí</string>
+    <string name="clear_data">Xoá dữ liệu</string>
+    <string name="are_you_sure_clear">Bạn có chắc muốn xoá toàn bộ dữ liệu cục bộ?</string>
+    <string name="cleared">Đã xoá</string>
+    <string name="language_changed_restart">Đã đổi ngôn ngữ. Vui lòng khởi động lại ứng dụng.</string>
+    <string name="register">Register</string>
 </resources>

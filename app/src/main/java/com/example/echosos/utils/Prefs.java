@@ -9,9 +9,9 @@ public final class Prefs {
     private static final String NAME = "echosos_prefs";
     private static final String KEY_UID = "current_user_id";
     private static final String KEY_SAFE_MODE = "safe_mode";
-
-    // === Phase 4: location interval ===
     private static final String KEY_LOC_INTERVAL_MS = "loc_interval_ms";
+    private static final String KEY_LANG_CODE = "lang_code";
+    private static final String KEY_SOS_TEMPLATE = "sos_template";
 
     /** Mặc định 10_000 ms nếu chưa set */
     public static long getLocIntervalMs(Context c) {
@@ -70,4 +70,40 @@ public final class Prefs {
                 .putBoolean(KEY_SAFE_MODE, enabled)
                 .apply();
     }
+
+    public static String getLangCode(Context c) {
+        return c.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .getString(KEY_LANG_CODE, "vi");
+    }
+
+    public static void setLangCode(Context c, String code) {
+        if (code == null || code.trim().isEmpty()) code = "vi";
+        c.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .edit().putString(KEY_LANG_CODE, code).apply();
+    }
+
+    public static String getSosTemplate(Context c) {
+        return c.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .getString(KEY_SOS_TEMPLATE, "");
+    }
+
+    public static void setSosTemplate(Context c, String template) {
+        c.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .edit().putString(KEY_SOS_TEMPLATE, template == null ? "" : template).apply();
+    }
+
+    public static void clearAll(Context c) {
+        c.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply();
+
+        try {
+            androidx.preference.PreferenceManager.getDefaultSharedPreferences(c)
+                    .edit()
+                    .clear()
+                    .apply();
+        } catch (Throwable ignore) { }
+    }
+
 }

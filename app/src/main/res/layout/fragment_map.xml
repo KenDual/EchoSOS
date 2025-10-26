@@ -30,7 +30,7 @@
             android:paddingEnd="10dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            android:text="±— m"
+            android:text="@string/accuracy_placeholder"
             android:textSize="12sp"
             android:textColor="@android:color/black"
             android:background="#CCFFFFFF"
@@ -49,10 +49,11 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/start_live"
             android:contentDescription="@string/start_live"
-            app:iconPadding="6dp"
-            app:cornerRadius="16dp" />
+            android:text="@string/start_live"
+            app:cornerRadius="16dp"
+            app:iconPadding="6dp" />
     </LinearLayout>
 
+    <include layout="@layout/view_loading" />
 </FrameLayout>

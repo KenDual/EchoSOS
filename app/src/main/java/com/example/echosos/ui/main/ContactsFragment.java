@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Patterns;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +41,9 @@ public class ContactsFragment extends Fragment {
     private final List<EmergencyContact> data = new ArrayList<>();
     private Adapter adapter;
 
+    private View emptyView;   // from view_empty_state.xml
+    private View loading;     // from view_loading.xml
+
     // Request READ_CONTACTS then open picker
     private final ActivityResultLauncher<String[]> permReq =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
@@ -57,7 +58,7 @@ public class ContactsFragment extends Fragment {
 
                 String name = null, phone = null, contactId = null;
 
-                // Query minimal projection to avoid -1 indexes
+                // Query minimal projection
                 String[] contactProj = {
                         ContactsContract.Contacts._ID,
                         ContactsContract.Contacts.DISPLAY_NAME
@@ -71,7 +72,7 @@ public class ContactsFragment extends Fragment {
                         name = c.getString(nameIdx);
                     }
                 } catch (Exception e) {
-                    toast("Could not read contact.");
+                    toast(getString(R.string.sos_partial_fail));
                 }
 
                 if (!TextUtils.isEmpty(contactId)) {
@@ -86,7 +87,7 @@ public class ContactsFragment extends Fragment {
                             phone = p.getString(phoneIdx);
                         }
                     } catch (Exception e) {
-                        toast("No phone found.");
+                        toast(getString(R.string.invalid_phone));
                     }
                 }
 
@@ -103,6 +104,9 @@ public class ContactsFragment extends Fragment {
         adapter = new Adapter();
         rv.setAdapter(adapter);
 
+        emptyView = v.findViewById(R.id.emptyState);
+        loading   = v.findViewById(R.id.loadingOverlay);
+
         // Swipe to delete
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override public boolean onMove(@NonNull RecyclerView r, @NonNull RecyclerView.ViewHolder vh, @NonNull RecyclerView.ViewHolder t) { return false; }
@@ -111,7 +115,7 @@ public class ContactsFragment extends Fragment {
                 if (pos >= 0 && pos < data.size()) {
                     EmergencyContact e = data.get(pos);
                     dao.delete(e.getId());
-                    reload();
+                    reload(); // sẽ tự update empty
                     toast(getString(R.string.delete));
                 }
             }
@@ -128,9 +132,12 @@ public class ContactsFragment extends Fragment {
     }
 
     private void reload() {
+        setLoading(true);
         data.clear();
         if (userId > 0) data.addAll(dao.getByUser(userId)); // sorted: primary first
         if (adapter != null) adapter.notifyDataSetChanged();
+        updateEmpty();
+        setLoading(false);
     }
 
     private void chooseAddMethod() {
@@ -184,8 +191,8 @@ public class ContactsFragment extends Fragment {
                     String phone = normalizePhone(text(etPhone));
                     String relation = text(etRelation);
 
-                    if (TextUtils.isEmpty(name)) { toast("Name required"); return; }
-                    if (TextUtils.isEmpty(phone) || !Patterns.PHONE.matcher(phone).matches()) { toast("Invalid phone"); return; }
+                    if (TextUtils.isEmpty(name)) { toast(getString(R.string.required_name)); return; }
+                    if (TextUtils.isEmpty(phone) || !Patterns.PHONE.matcher(phone).matches()) { toast(getString(R.string.invalid_phone)); return; }
 
                     int prio = (int) slider.getValue();
                     if (e == null) {
@@ -220,11 +227,18 @@ public class ContactsFragment extends Fragment {
         Toast.makeText(requireContext(), m, Toast.LENGTH_SHORT).show();
     }
 
+    private void setLoading(boolean show) {
+        if (loading != null) loading.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateEmpty() {
+        if (emptyView != null) emptyView.setVisibility(data.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
     // ----------------- RecyclerView Adapter -----------------
     private class Adapter extends RecyclerView.Adapter<VH> {
 
-        @NonNull
-        @Override
+        @NonNull @Override
         public VH onCreateViewHolder(@NonNull ViewGroup p, int vType) {
             View v = LayoutInflater.from(p.getContext()).inflate(R.layout.item_contact, p, false);
             return new VH(v);
@@ -239,7 +253,6 @@ public class ContactsFragment extends Fragment {
             String meta = (e.getPriority() == 1
                     ? h.itemView.getContext().getString(R.string.primary)
                     : h.itemView.getContext().getString(R.string.secondary));
-
             if (!TextUtils.isEmpty(e.getRelation())) meta += " • " + e.getRelation();
             h.tvMeta.setText(meta);
 
@@ -265,7 +278,7 @@ public class ContactsFragment extends Fragment {
             super(v);
             tvName = v.findViewById(R.id.tvName);
             tvPhone = v.findViewById(R.id.tvPhone);
-            tvMeta = v.findViewById(R.id.tvMeta);
+            tvMeta  = v.findViewById(R.id.tvMeta);
         }
     }
 }

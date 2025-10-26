@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Language -->
+    <PreferenceCategory
+        android:title="Language">
+        <ListPreference
+            android:key="pref_lang_code"
+            android:title="App language"
+            android:defaultValue="vi"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/pref_lang_entries"
+            android:entryValues="@array/pref_lang_values" />
+    </PreferenceCategory>
+
+    <!-- SOS message template -->
+    <PreferenceCategory
+        android:title="SOS message">
+        <EditTextPreference
+            android:key="pref_sos_template"
+            android:title="SOS message template"
+            android:dialogTitle="Edit SOS message template"
+            app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:key="pref_template_hint"
+            android:title="Placeholders"
+            android:summary="{lat} {lng} {acc} {address} {maps}"
+            android:selectable="false" />
+    </PreferenceCategory>
+
+    <!-- Location & Recording -->
+    <PreferenceCategory
+        android:title="Tracking and Recording">
+        <ListPreference
+            android:key="pref_loc_interval"
+            android:title="Location update interval"
+            android:defaultValue="10000"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/pref_interval_entries"
+            android:entryValues="@array/pref_interval_values" />
+        <SwitchPreferenceCompat
+            android:key="pref_auto_record"
+            android:title="Auto recording"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+    <!-- Maintenance -->
+    <PreferenceCategory
+        android:title="Maintenance">
+        <Preference
+            android:key="pref_clear_data"
+            android:title="Clear data"
+            android:summary="Delete local DB and preferences" />
+        <Preference
+            android:key="pref_about"
+            android:title="About" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

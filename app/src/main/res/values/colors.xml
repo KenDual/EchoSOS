@@ -2,4 +2,42 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="onSecondary">#FFFFFF</color>
+
+
+    <color name="onError">#FFFFFF</color>
+
+
+    <!-- Primary Colors -->
+    <color name="primary">#1976D2</color>
+    <color name="primary_dark">#0D47A1</color>
+    <color name="primary_light">#42A5F5</color>
+
+    <!-- Surface Colors -->
+    <color name="background">#F5F5F5</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#E3F2FD</color>
+
+    <!-- Text Colors -->
+    <color name="onBackground">#212121</color>
+    <color name="onSurface">#212121</color>
+    <color name="onSurfaceVariant">#757575</color>
+    <color name="onPrimary">#FFFFFF</color>
+
+    <!-- Accent Colors -->
+    <color name="secondary">#FF9800</color>
+    <color name="error">#D32F2F</color>
+    <color name="success">#388E3C</color>
+
+    <!-- SOS Button -->
+    <color name="sos_button">#D32F2F</color>
+    <color name="sos_button_pressed">#B71C1C</color>
+
+    <!-- Other -->
+    <color name="outline">#E0E0E0</color>
+    <color name="ripple_color">#20212121</color>
+
+    <!-- Bottom Nav -->
+    <color name="bottom_nav_selected">#212121</color>
+    <color name="bottom_nav_unselected">#80212121</color>
 </resources>

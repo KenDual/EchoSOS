@@ -32,9 +32,10 @@ public class CallFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
-        bindCall(v, R.id.btnPolice, "Police", "112");
-        bindCall(v, R.id.btnAmbulance, "Ambulance", "115");
-        bindCall(v, R.id.btnFamily, "Family", "0768793319");
+        // Dùng string resource để đồng bộ i18n với layout
+        bindCall(v, R.id.btnPolice,    getString(R.string.call_police_112),    "112");
+        bindCall(v, R.id.btnAmbulance, getString(R.string.call_ambulance_115), "115");
+        bindCall(v, R.id.btnFamily,    getString(R.string.call_family_sample), "0768793319");
     }
 
     private void bindCall(View root, int btnId, String label, String phone) {
@@ -43,9 +44,9 @@ public class CallFragment extends Fragment {
     }
 
     private void tryCall(String label, String phone) {
-        if (!Permissions.hasAll(requireContext(), new String[]{Manifest.permission.CALL_PHONE})) {
+        if (!Permissions.hasAll(requireContext(), new String[]{ Manifest.permission.CALL_PHONE })) {
             pendingLabel = label; pendingPhone = phone;
-            requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, REQ_CALL);
+            requestPermissions(new String[]{ Manifest.permission.CALL_PHONE }, REQ_CALL);
             return;
         }
         startCall(label, phone);
@@ -75,7 +76,7 @@ public class CallFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int req, @NonNull String[] perms, @NonNull int[] res) {
         super.onRequestPermissionsResult(req, perms, res);
-        if (req == REQ_CALL && Permissions.hasAll(requireContext(), new String[]{Manifest.permission.CALL_PHONE})) {
+        if (req == REQ_CALL && Permissions.hasAll(requireContext(), new String[]{ Manifest.permission.CALL_PHONE })) {
             if (pendingPhone != null) startCall(pendingLabel, pendingPhone);
             pendingLabel = pendingPhone = null;
         }

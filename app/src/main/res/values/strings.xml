@@ -42,5 +42,39 @@
     <string name="safe_mode_off">Safe Mode is OFF</string>
     <string name="safe_mode_block_sos">Safe Mode is ON. SOS is blocked.</string>
     <string name="open_wifi_settings">Open Wi-Fi settings</string>
+    <string name="accuracy_placeholder">±— m</string>
+    <string name="call_police_112">Police (112)</string>
+    <string name="call_ambulance_115">Ambulance (115)</string>
+    <string name="call_family_sample">Family (0768793319)</string>
+    <string name="invalid_phone">Invalid phone number</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="required_name">Name is required</string>
+    <string name="need_register_first">Please create your profile before using SOS.</string>
+
+    <string name="loading">Loading…</string>
+    <string name="empty_contacts">No emergency contacts yet</string>
+    <string name="empty_history">No history</string>
+
+    <!-- Settings / About -->
+    <string name="about_title">About</string>
+    <string name="settings_title">Settings</string>
+    <string name="sos_template">SOS message template</string>
+    <string name="auto_record">Auto recording</string>
+    <string name="location_interval">Location update interval</string>
+    <string name="clear_data">Clear data</string>
+    <string name="are_you_sure_clear">Are you sure you want to delete all local data?</string>
+    <string name="cleared">Cleared</string>
+    <string name="language_changed_restart">Language changed. Please restart the app to apply.</string>
+    <string name="register">Register</string>
+
+    <!-- Checkout activity -->
+    <string name="title_activity_checkout">CheckoutActivity</string>
+    <string name="checkout_item_description">Description</string>
+    <string name="googlepay_status_unavailable" translatable="false">Unfortunately, Google Pay is
+        not available on this phone.
+    </string>
+    <string name="payments_show_name" translatable="false">Successfully received payment data for
+        %s!
+    </string>
 
 </resources>

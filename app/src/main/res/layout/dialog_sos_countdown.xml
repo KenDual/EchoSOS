@@ -1,23 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="20dp"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:background="@color/surface"
+    android:gravity="center">
 
+    <!-- Warning Icon -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🚨"
+        android:textSize="48sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đang kích hoạt SOS"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/onSurface"
+        android:textAlignment="center"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Countdown Text -->
     <TextView
         android:id="@+id/tvCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/sos_countdown"
-        android:textSize="18sp" android:paddingBottom="12dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content" />
+        android:textSize="16sp"
+        android:textColor="@color/onSurfaceVariant"
+        android:textAlignment="center"
+        android:layout_marginBottom="24dp" />
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
+    <!-- Progress Indicator -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:indeterminate="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        app:indicatorColor="@color/sos_button"
+        app:trackColor="@color/outline"
+        app:trackThickness="4dp"
+        android:layout_marginBottom="24dp" />
 
-    <Button
+    <!-- Info Text -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tin nhắn khẩn cấp sẽ được gửi đến:\n• Người liên hệ khẩn cấp\n• Dịch vụ cứu hộ"
+        android:textSize="13sp"
+        android:textColor="@color/onSurfaceVariant"
+        android:textAlignment="center"
+        android:lineSpacingExtra="2dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Cancel Button -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
         android:text="@string/cancel"
-        android:layout_marginTop="16dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content" />
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        app:cornerRadius="12dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/error"
+        app:backgroundTint="@android:color/transparent"
+        android:textColor="@color/error" />
+
 </LinearLayout>

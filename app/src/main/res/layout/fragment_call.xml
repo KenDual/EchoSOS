@@ -2,48 +2,169 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
 
     <LinearLayout
-        android:padding="16dp"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
 
+        <!-- Header Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/emergency_call"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/onBackground" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gọi nhanh các số khẩn cấp"
+                android:textSize="14sp"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Emergency Services Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🚨 Dịch vụ khẩn cấp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/onSurface"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Police Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPolice"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="@string/call_police_112"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_police"
+                    app:iconGravity="start"
+                    app:iconPadding="12dp"
+                    app:cornerRadius="12dp"
+                    app:strokeWidth="0dp"
+                    app:backgroundTint="#1976D2"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Ambulance Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAmbulance"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="@string/call_ambulance_115"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_ambulance"
+                    app:iconGravity="start"
+                    app:iconPadding="12dp"
+                    app:cornerRadius="12dp"
+                    app:strokeWidth="0dp"
+                    app:backgroundTint="#D32F2F"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Fire Button (Optional) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFire"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="Cứu hỏa: 114"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_fire"
+                    app:iconGravity="start"
+                    app:iconPadding="12dp"
+                    app:cornerRadius="12dp"
+                    app:strokeWidth="0dp"
+                    app:backgroundTint="#F57C00" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Personal Contacts Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👨‍👩‍👧 Liên hệ cá nhân"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/onSurface"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Family Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFamily"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="@string/call_family_sample"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_person"
+                    app:iconGravity="start"
+                    app:iconPadding="12dp"
+                    app:cornerRadius="12dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/outline"
+                    app:backgroundTint="@color/primary_light"
+                    app:iconTint="@color/primary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Emergency Info -->
         <TextView
-            android:id="@+id/tvTitle"
-            android:text="@string/emergency_call"
-            android:textStyle="bold"
-            android:textSize="18sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPolice"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Police (112)"
-            android:layout_marginTop="12dp"
-            app:cornerRadius="16dp"
-            app:strokeWidth="1dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAmbulance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ambulance (115)"
-            android:layout_marginTop="8dp"
-            app:cornerRadius="16dp"
-            app:strokeWidth="1dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFamily"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Family (0768793319)"
-            android:layout_marginTop="8dp"
-            app:cornerRadius="16dp"
-            app:strokeWidth="1dp" />
+            android:text="💡 Mẹo: Lưu số điện thoại người thân vào danh bạ khẩn cấp"
+            android:textSize="12sp"
+            android:textColor="@color/onSurfaceVariant"
+            android:layout_marginTop="16dp"
+            android:padding="8dp" />
 
     </LinearLayout>
 </ScrollView>

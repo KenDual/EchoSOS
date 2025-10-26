@@ -1,10 +1,14 @@
 package com.example.echosos.ui.main;
 
+import static android.text.TextUtils.replace;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
                 showNoInternetDialog();
             } else if ("com.example.echosos.NETWORK_ONLINE".equals(a)) {
                 dismissNoInternetDialog();
-                // Online trở lại -> kick retry upload
                 startService(new Intent(MainActivity.this, UploadRetryService.class));
             }
         }
@@ -40,26 +43,33 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView nav = findViewById(R.id.bottom_nav);
 
         nav.setOnItemSelectedListener(item -> {
-            Fragment f;
             int id = item.getItemId();
-            if (id == R.id.nav_map) {
-                f = new MapFragment();
+            if (id == R.id.nav_home) {
+                replace(new HomeFragment());
+                return true;
+            } else if (id == R.id.nav_map) {
+                replace(new MapFragment());
+                return true;
             } else if (id == R.id.nav_contacts) {
-                f = new ContactsFragment();
+                replace(new ContactsFragment());
+                return true;
             } else if (id == R.id.nav_call) {
-                f = new CallFragment();
-            } else {
-                f = new HomeFragment();
+                replace(new CallFragment());
+                return true;
+            } else if (id == R.id.action_settings) {
+                startActivity(new Intent(this, SettingsActivity.class));
+                return false; // giữ tab hiện tại
+            } else if (id == R.id.action_about) {
+                startActivity(new Intent(this, AboutActivity.class));
+                return false; // giữ tab hiện tại
             }
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, f)
-                    .commit();
-            return true;
+            return false;
         });
 
         if (savedInstanceState == null) {
             nav.setSelectedItemId(R.id.nav_home);
         }
+
     }
 
     @Override
@@ -97,9 +107,38 @@ public class MainActivity extends AppCompatActivity {
         noInternetDialog.show();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (id == R.id.action_about) { // optional
+            startActivity(new Intent(this, AboutActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     private void dismissNoInternetDialog() {
         if (noInternetDialog != null && noInternetDialog.isShowing()) {
             noInternetDialog.dismiss();
         }
     }
+
+    //Helper
+    private void replace(Fragment f) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, f)
+                .commit();
+    }
+
 }
