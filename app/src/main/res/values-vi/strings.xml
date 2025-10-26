@@ -35,6 +35,11 @@
     <string name="accuracy">Chính xác</string>
     <string name="recording_on">Đang thu</string>
     <string name="recording_off">Ngắt thu</string>
-    <string name="upload_failed_retry">Gửi thất bại. Sẽ thử la.</string>
+    <string name="upload_failed_retry">Gửi thất bại. Sẽ thử lại.</string>
     <string name="no_internet">Không có kết nối mạng</string>
+    <string name="safe_mode">Chế độ an toàn</string>
+    <string name="safe_mode_on">Đã bật Chế độ an toàn</string>
+    <string name="safe_mode_off">Đã tắt Chế độ an toàn</string>
+    <string name="safe_mode_block_sos">Chế độ an toàn đang bật. Không thể gửi SOS.</string>
+    <string name="open_wifi_settings">Mở cài đặt Wi-Fi</string>
 </resources>

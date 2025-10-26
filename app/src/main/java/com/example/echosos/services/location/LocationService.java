@@ -62,6 +62,12 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // SAFE MODE GUARD
+        if (Prefs.isSafeMode(getApplicationContext())) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
         startAsForeground();
         startLocationUpdates();
         return START_STICKY;
@@ -71,7 +77,7 @@ public class LocationService extends Service {
     private void startLocationUpdates() {
         if (!Permissions.hasAll(this, Permissions.LOCATION)) return;
 
-        long interval = Prefs.getLocIntervalMs(this);   // mặc định bạn set 10000ms trong Prefs
+        long interval = Prefs.getLocIntervalMs(this);   // mặc định 10000ms trong Prefs
         if (interval < 3000L) interval = 3000L;         // guard tối thiểu 3s
 
         LocationRequest req = new LocationRequest.Builder(

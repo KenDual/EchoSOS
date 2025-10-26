@@ -37,5 +37,10 @@
     <string name="recording_off">Recording off</string>
     <string name="upload_failed_retry">Upload failed. Will retry.</string>
     <string name="no_internet">No internet connection</string>
+    <string name="safe_mode">Safe Mode</string>
+    <string name="safe_mode_on">Safe Mode is ON</string>
+    <string name="safe_mode_off">Safe Mode is OFF</string>
+    <string name="safe_mode_block_sos">Safe Mode is ON. SOS is blocked.</string>
+    <string name="open_wifi_settings">Open Wi-Fi settings</string>
 
 </resources>

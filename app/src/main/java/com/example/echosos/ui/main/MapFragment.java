@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.example.echosos.R;
 import com.example.echosos.services.location.LocationService;
 import com.example.echosos.utils.Permissions;
+import com.example.echosos.utils.Prefs;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.*;
@@ -30,6 +31,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Circle accCircle;
     private boolean firstFix = true;
     private FusedLocationProviderClient fused;
+    private View btnToggleLive;
 
     private final BroadcastReceiver locReceiver = new BroadcastReceiver() {
         @Override public void onReceive(Context ctx, Intent i) {
@@ -68,21 +70,45 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         tvAccuracy = v.findViewById(R.id.tvAccuracy);
         fused = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        // Nút START LIVE (nếu có trong layout)
-        View btn = v.findViewById(R.id.btnToggleLive);
-        if (btn != null) {
-            btn.setOnClickListener(x -> {
+        // Nút START LIVE
+        btnToggleLive = v.findViewById(R.id.btnToggleLive);
+        if (btnToggleLive != null) {
+            // Disable khi Safe Mode bật
+            applySafeModeState();
+
+            btnToggleLive.setOnClickListener(x -> {
+                if (Prefs.isSafeMode(requireContext())) {
+                    // chặn khi đang Safe Mode
+                    android.widget.Toast.makeText(requireContext(),
+                            getString(R.string.safe_mode_on),
+                            android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!Permissions.hasAll(requireContext(), Permissions.LOCATION)) {
                     requestPermissions(Permissions.LOCATION, 1010);
                     return;
                 }
                 ContextCompat.startForegroundService(requireContext(), new Intent(requireContext(), LocationService.class));
-                if (btn instanceof android.widget.Button) ((android.widget.Button) btn).setText(R.string.stop_live);
+                if (btnToggleLive instanceof android.widget.Button) {
+                    ((android.widget.Button) btnToggleLive).setText(R.string.stop_live);
+                }
             });
         }
 
         SupportMapFragment mapFrag = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFrag != null) mapFrag.getMapAsync(this);
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        applySafeModeState();
+    }
+
+    private void applySafeModeState() {
+        if (btnToggleLive == null) return;
+        boolean safe = Prefs.isSafeMode(requireContext());
+        btnToggleLive.setEnabled(!safe);
+        btnToggleLive.setAlpha(safe ? 0.5f : 1f);
     }
 
     @Override
@@ -123,10 +149,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-
     @Override
     public void onDestroyView() {
-        map = null; meMarker = null; accCircle = null; tvAccuracy = null;
+        map = null; meMarker = null; accCircle = null; tvAccuracy = null; btnToggleLive = null;
         super.onDestroyView();
     }
 }

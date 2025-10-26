@@ -80,4 +80,29 @@ public class RecordingChunkDao {
         }
         return out;
     }
+
+    public List<RecordingChunk> getPending() {
+        List<RecordingChunk> list = new ArrayList<>();
+        // Điều chỉnh tên bảng/cột nếu bạn dùng DatabaseContract khác
+        Cursor c = db.rawQuery(
+                "SELECT id, user_id, event_id, local_path, status, created_at " +
+                        "FROM recording_chunks WHERE status=? ORDER BY created_at ASC",
+                new String[]{"queued"}
+        );
+        try {
+            while (c.moveToNext()) {
+                RecordingChunk rc = new RecordingChunk();
+                rc.setId(c.getLong(0));
+                rc.setUserId(c.getLong(1));
+                rc.setEventId(c.getLong(2));
+                rc.setLocalPath(c.getString(3));
+                rc.setStatus(c.getString(4));
+                rc.setCreatedAt(c.getLong(5));
+                list.add(rc);
+            }
+        } finally {
+            c.close();
+        }
+        return list;
+    }
 }

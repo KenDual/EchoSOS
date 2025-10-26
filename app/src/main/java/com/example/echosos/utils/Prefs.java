@@ -8,6 +8,7 @@ public final class Prefs {
 
     private static final String NAME = "echosos_prefs";
     private static final String KEY_UID = "current_user_id";
+    private static final String KEY_SAFE_MODE = "safe_mode";
 
     // === Phase 4: location interval ===
     private static final String KEY_LOC_INTERVAL_MS = "loc_interval_ms";
@@ -58,8 +59,15 @@ public final class Prefs {
                 .edit().putString("pin", pin == null ? "" : pin).apply();
     }
 
-    // (tuỳ chọn cho Phase 4 sau này)
-    // private static final String KEY_AUTO_RECORD = "auto_record_enabled";
-    // public static boolean isAutoRecordEnabled(Context c) { ... }
-    // public static void setAutoRecordEnabled(Context c, boolean b) { ... }
+    public static boolean isSafeMode(Context ctx) {
+        return ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .getBoolean(KEY_SAFE_MODE, false);
+    }
+
+    public static void setSafeMode(Context ctx, boolean enabled) {
+        ctx.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_SAFE_MODE, enabled)
+                .apply();
+    }
 }

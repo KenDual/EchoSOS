@@ -34,6 +34,9 @@ import com.example.echosos.utils.Permissions;
 import com.example.echosos.utils.Prefs;
 import com.example.echosos.utils.SmsSender;
 import com.example.echosos.utils.SosMessageBuilder;
+import com.example.echosos.utils.NetworkUtils;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,32 +45,55 @@ public class HomeFragment extends Fragment {
 
     private static final int REQ_SOS = 1001;
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c, @Nullable Bundle b) {
         return inf.inflate(R.layout.fragment_home, c, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
+        // Nút SOS
         Button btn = v.findViewById(R.id.btnSos);
-        btn.setOnClickListener(view -> startSosCountdown());
+        btn.setOnClickListener(view -> precheckAndStart());
+
+        // >>> GẮN SWITCH SAFE MODE <<<
+        MaterialSwitch sw = v.findViewById(R.id.switch_safe_mode);
+        if (sw != null) {
+            sw.setChecked(Prefs.isSafeMode(requireContext()));
+            sw.setOnCheckedChangeListener((button, checked) -> {
+                if (checked) {
+                    Prefs.setSafeMode(requireContext(), true);
+                    // tắt các service nhạy cảm ngay lập tức
+                    requireContext().stopService(new Intent(requireContext(), LocationService.class));
+                    requireContext().stopService(new Intent(requireContext(), RecorderService.class));
+                    android.widget.Toast.makeText(requireContext(), getString(R.string.safe_mode_on), android.widget.Toast.LENGTH_SHORT).show();
+                } else {
+                    Prefs.setSafeMode(requireContext(), false);
+                    android.widget.Toast.makeText(requireContext(), getString(R.string.safe_mode_off), android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int req, @NonNull String[] perms, @NonNull int[] res) {
         super.onRequestPermissionsResult(req, perms, res);
         if (req == REQ_SOS && Permissions.hasAll(requireContext(), mergeSosPerms())) {
-            startSosCountdown();
+            precheckAndStart();
         }
     }
 
-    private void startSosCountdown() {
-        // 0) Bắt buộc có user hợp lệ để tránh vỡ FK
+    // Tiền kiểm: Safe Mode + Quyền + Mạng
+    private void precheckAndStart() {
+        if (Prefs.isSafeMode(requireContext())) {
+            android.widget.Toast.makeText(requireContext(), getString(R.string.safe_mode_block_sos), android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         long userId = Prefs.getUserId(requireContext());
         if (userId <= 0 || new UserDao(requireContext()).findById(userId) == null) {
-            new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Cần đăng ký tài khoản")
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.app_name)
                     .setMessage("Hãy tạo hồ sơ trước khi dùng SOS.")
                     .setPositiveButton("Đăng ký", (d, w) -> {
                         requireActivity().getSupportFragmentManager().beginTransaction()
@@ -79,14 +105,28 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        // 1) Quyền: LOCATION + SMS + RECORD_AUDIO
         String[] need = mergeSosPerms();
         if (!Permissions.hasAll(requireContext(), need)) {
             requestPermissions(need, REQ_SOS);
             return;
         }
 
-        // 2) Hiện countdown
+        if (!NetworkUtils.isOnline(requireContext())) {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.no_internet)
+                    .setMessage(getString(R.string.no_internet))
+                    .setPositiveButton(R.string.sos, (d, w) -> startSosCountdown())
+                    .setNegativeButton(R.string.cancel, null)
+                    .setNeutralButton(R.string.open_wifi_settings, (d, w) ->
+                            startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS)))
+                    .show();
+            return;
+        }
+
+        startSosCountdown();
+    }
+
+    private void startSosCountdown() {
         final TextView tv = new TextView(requireContext());
         tv.setPadding(32, 32, 32, 32);
         tv.setText(getString(R.string.sos_countdown, 5));
@@ -103,8 +143,7 @@ public class HomeFragment extends Fragment {
         new CountDownTimer(5000, 1000) {
             int sec = 5;
 
-            @Override
-            public void onTick(long ms) {
+            @Override public void onTick(long ms) {
                 sec--;
                 tv.setText(getString(R.string.sos_countdown, sec));
                 if (vib != null) {
@@ -118,29 +157,31 @@ public class HomeFragment extends Fragment {
                 if (!dlg.isShowing()) cancel();
             }
 
-            @Override
-            public void onFinish() {
+            @Override public void onFinish() {
                 if (!dlg.isShowing()) return;
                 dlg.dismiss();
 
-                // 3) Lấy vị trí 1 lần
+                // Chặn nếu vừa bật Safe Mode trong lúc đếm
+                if (Prefs.isSafeMode(requireContext())) {
+                    android.widget.Toast.makeText(requireContext(), getString(R.string.safe_mode_block_sos), android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                long userId = Prefs.getUserId(requireContext());
+
                 LocationFetcher.getCurrentFix(requireContext(), fix -> {
-                    // 4) Build nội dung SOS
                     String msg = SosMessageBuilder.build(requireContext(), fix);
 
-                    // 5) Lấy danh bạ khẩn cấp
                     EmergencyContactDao cDao = new EmergencyContactDao(requireContext());
                     List<String> phones = new ArrayList<>();
                     for (EmergencyContact c : cDao.getByUser(userId)) phones.add(c.getPhone());
 
-                    // 6) Gửi SMS
                     SmsSender.sendBulk(requireContext(), phones, msg, new SmsSender.Callback() {
                         boolean allOk = true;
 
                         @Override public void onEachResult(String phone, boolean ok) { allOk &= ok; }
 
                         @Override public void onAllDone() {
-                            // 7) Lưu lịch sử SOS (bọc try để không văng app)
                             long eventId = -1;
                             try {
                                 SosEvent e = new SosEvent();
@@ -162,16 +203,18 @@ public class HomeFragment extends Fragment {
                                 return;
                             }
 
-                            // 8) Start services an toàn cho mọi API
+                            // Nếu vừa bật Safe Mode sau khi gửi SMS -> không start service
+                            if (Prefs.isSafeMode(requireContext())) {
+                                android.widget.Toast.makeText(requireContext(), getString(R.string.safe_mode_on), android.widget.Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
                             Context app = requireContext().getApplicationContext();
-
-                            Intent loc = new Intent(app, LocationService.class);
-                            ContextCompat.startForegroundService(app, loc);
-
-                            Intent rec = new Intent(app, RecorderService.class)
-                                    .putExtra(RecorderService.EXTRA_USER_ID, userId)
-                                    .putExtra(RecorderService.EXTRA_EVENT_ID, eventId);
-                            ContextCompat.startForegroundService(app, rec);
+                            ContextCompat.startForegroundService(app, new Intent(app, LocationService.class));
+                            ContextCompat.startForegroundService(app,
+                                    new Intent(app, RecorderService.class)
+                                            .putExtra(RecorderService.EXTRA_USER_ID, userId)
+                                            .putExtra(RecorderService.EXTRA_EVENT_ID, eventId));
 
                             android.widget.Toast.makeText(
                                     requireContext(),

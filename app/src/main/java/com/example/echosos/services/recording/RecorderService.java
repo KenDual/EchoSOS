@@ -12,6 +12,7 @@ import com.example.echosos.data.dao.RecordingChunkDao;
 import com.example.echosos.data.local.DatabaseHelper;
 import com.example.echosos.data.model.RecordingChunk;
 import com.example.echosos.utils.UploadHelper;
+import com.example.echosos.utils.Prefs;
 
 import java.io.File;
 
@@ -32,6 +33,12 @@ public class RecorderService extends Service {
     }
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
+        // SAFE MODE GUARD
+        if (Prefs.isSafeMode(getApplicationContext())) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
         userId = intent != null ? intent.getLongExtra(EXTRA_USER_ID, 0) : 0;
         eventId = intent != null ? intent.getLongExtra(EXTRA_EVENT_ID, 0) : 0;
 
@@ -56,6 +63,11 @@ public class RecorderService extends Service {
 
     private final Runnable loop = new Runnable() {
         @Override public void run() {
+            // Nếu trong lúc chạy người dùng bật Safe Mode -> dừng vòng lặp
+            if (Prefs.isSafeMode(getApplicationContext())) {
+                stopSelf();
+                return;
+            }
             recordNewChunk();
             handler.postDelayed(this, 5000L);
         }
@@ -83,6 +95,13 @@ public class RecorderService extends Service {
             // Lên lịch stop sau 5s, enqueue + upload
             handler.postDelayed(() -> {
                 stopRecorderSafe();
+                // Nếu người dùng vừa bật Safe Mode trong khi chờ -> không enqueue/upload
+                if (Prefs.isSafeMode(getApplicationContext())) {
+                    // Xoá file rác nếu có
+                    try { if (out.exists()) out.delete(); } catch (Exception ignored) {}
+                    stopSelf();
+                    return;
+                }
                 enqueueAndUpload(out);
             }, 5000L);
 
@@ -129,7 +148,7 @@ public class RecorderService extends Service {
     }
 
     @Override public void onDestroy() {
-        handler.removeCallbacksAndMessages(null);
+        if (handler != null) handler.removeCallbacksAndMessages(null);
         stopRecorderSafe();
         super.onDestroy();
     }
